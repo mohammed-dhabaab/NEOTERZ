@@ -49,8 +49,8 @@ NEOTERZ is an AI-based system to count visitors, detect thefts, and analyze data
 
 
 ## ✍Authors
-- [@Mohammed-Dhabaab](github.com/mohammed-dhabaab)
-- [@Abubakr Bialfakhr]()
+- [Mohammed Dhabaab](github.com/mohammed-dhabaab)
+- [Abubaker Mohammed](github.com/Bakkori)
 
 
 
