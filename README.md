@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo-2.png" alt="project logo" />
+  <img src="client\src\assets\logo\logo-2.png" alt="project logo" />
 </p>
 
 
@@ -9,8 +9,12 @@
 
 
 ## 📂Table of Contents
+- [�Table of Contents](#table-of-contents)
 - [📋Project Description](#project-description)
 - [⛏️Built Using](#️built-using)
+  - [Front-End:](#front-end)
+  - [Back-End:](#back-end)
+  - [Design:](#design)
 - [✍Authors](#authors)
 - [💳License](#license)
 - [🏅Acknowledgments](#acknowledgments)
