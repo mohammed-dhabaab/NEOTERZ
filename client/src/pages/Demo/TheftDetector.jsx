@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { fabric } from 'fabric';
-import frame from "../../../frame.jpg"
 import styles from '../../styles';
 
 import ColorPicker from './ColorPicker';

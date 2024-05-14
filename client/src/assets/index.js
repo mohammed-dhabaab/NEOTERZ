@@ -22,9 +22,6 @@ import twitter from "./social-media/twitter.svg";
 
 import plus from "./general/plus.svg"
 
-import visitorsCounterImg from "./trial-videos-imges/visitors counter.png"
-import theftDetectorImg from "./trial-videos-imges/theft detector.png"
-
 import closeVideo from "./general/close-line.svg"
 export {
   logo,
@@ -49,9 +46,6 @@ export {
   twitter,
 
   plus,
-
-  visitorsCounterImg,
-  theftDetectorImg,
 
   closeVideo
 };
