@@ -120,6 +120,10 @@
   box-shadow: var(--card-shadow);
 }
 
+.icon-color {
+  color: #65d6de;
+}
+
 .feature-icon-color {
   color: #65d6de;
 }

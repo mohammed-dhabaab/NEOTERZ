@@ -9,9 +9,12 @@ import { FaUndoAlt, FaRedoAlt } from "react-icons/fa";
 import { IoSave } from "react-icons/io5";
 import { AiOutlineAppstoreAdd } from "react-icons/ai";
 import { GiProcessor } from "react-icons/gi";
+const rgbToHexa = (rgbColor) => {
+  const [r, g, b] = rgbColor.match(/\d+/g);
+  return '#' + ((1 << 24) | (+r << 16) | (+g << 8) | +b).toString(16).slice(1);
+}
 
-
-const TheftDetector = ({ selectedFrame, fileName }) => {
+const TheftDetector = ({ selectedFrame, programType, fileName }) => {
   const [parentWidth, setParentWidth] = useState(0);
   const parentRef = useRef(null);
 
@@ -26,6 +29,7 @@ const TheftDetector = ({ selectedFrame, fileName }) => {
   const [selectedShapeColor, setSelectedShapeColor] = useState('#000000');
   const [polygons, setPolygons] = useState([]);
 
+  const [processedVideo, setProcessedVideo] = useState();
 
   useEffect(() => {
     const handleResize = () => {
@@ -126,17 +130,55 @@ const TheftDetector = ({ selectedFrame, fileName }) => {
     setRedoStack([]);
   };
 
+  // const updatePolygons = useCallback(() => {
+  //   const updatedPolygons = [];
+  //   canvas.getObjects().forEach((object) => {
+  //     const polygonPoints = object.item(0).points.map(({ x, y }) => {
+  //       const transformedPoint = fabric.util.transformPoint(
+  //         new fabric.Point(x - object.width / 2, y - object.height / 2),
+  //         object.calcTransformMatrix()
+  //       );
+  //       return [transformedPoint.x, transformedPoint.y];
+  //     });
+  //     updatedPolygons.push(polygonPoints);
+  //   });
+  //   setPolygons(updatedPolygons);
+  // }, [canvas]);
+
+  // useEffect(() => {
+  //   const handleObjectModified = () => {
+  //     updatePolygons();
+  //   };
+
+  //   if (canvas) {
+  //     canvas.on('object:modified', handleObjectModified);
+  //   }
+
+  //   return () => {
+  //     if (canvas) {
+  //       canvas.off('object:modified', handleObjectModified);
+  //     }
+  //   };
+  // }, [canvas, updatePolygons]);
+
   const updatePolygons = useCallback(() => {
     const updatedPolygons = [];
     canvas.getObjects().forEach((object) => {
-      const polygonPoints = object.item(0).points.map(({ x, y }) => {
-        const transformedPoint = fabric.util.transformPoint(
-          new fabric.Point(x - object.width / 2, y - object.height / 2),
-          object.calcTransformMatrix()
-        );
-        return [transformedPoint.x, transformedPoint.y];
-      });
-      updatedPolygons.push(polygonPoints);
+      if (object.type === 'group') {
+        const polygonPoints = object.item(0).points.map(({ x, y }) => {
+          const transformedPoint = fabric.util.transformPoint(
+            new fabric.Point(x - object.width / 2, y - object.height / 2),
+            object.calcTransformMatrix()
+          );
+          return [transformedPoint.x, transformedPoint.y];
+        });
+        const polygonColor = rgbToHexa(object.fill); 
+        
+        updatedPolygons.push({
+          points: fitShape(parentWidth, parentHeight, 1020, 500, polygonPoints),
+          color: polygonColor,
+        });
+      }
     });
     setPolygons(updatedPolygons);
   }, [canvas]);
@@ -156,21 +198,40 @@ const TheftDetector = ({ selectedFrame, fileName }) => {
       }
     };
   }, [canvas, updatePolygons]);
+  // const savePoints = () => {
+  //   console.log(polygons);
+  // };
 
-  const savePoints = () => {
-    console.log(polygons);
+
+
+  const callNeotVideoProcessAPI = async () => {
+    const response = await fetch("http://neoterz-ai-api.uaenorth.cloudapp.azure.com:8080/get-and-process-video", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(      {
+        "video_path": videoFile.fileName,
+        "program": programType,
+        "areas": polygons
+      })
+    });
+  
+    const processedVideoBlob = await response.blob();
+  
+    if (response.ok) {
+      const processedVideoUrl = URL.createObjectURL(processedVideoBlob);
+      setProcessedVideo(processedVideoUrl)
+  
+      console.log("Processed video URL:", processedVideoUrl);
+    } else {
+      console.log('Request failed with status:', response.status);
+    }
   };
-
-
-  const [isChecked, setIsChecked] = useState(false);
-
-  const handleCheckboxChange = () => {
-    setIsChecked(!isChecked);
-  };
-
 
   return (
-    <div className='w-full'>
+    <>
+    {<div className='w-full'>
       <div
         ref={parentRef}
         className={`relative w-full h-ful`}
@@ -218,9 +279,9 @@ const TheftDetector = ({ selectedFrame, fileName }) => {
         </div>
 
         <div className='flex gap-1'>
-          <Tooltip title="Save" arrow enterDelay={700} leaveDelay={100}>
+          {/* <Tooltip title="Save" arrow enterDelay={700} leaveDelay={100}>
             <button onClick={savePoints} className={styles.controlButton}><IoSave /></button>
-          </Tooltip>
+          </Tooltip> */}
 
           <Tooltip title="Process" arrow enterDelay={700} leaveDelay={100}>
             <button className={styles.controlButton}><GiProcessor /></button>
@@ -230,16 +291,9 @@ const TheftDetector = ({ selectedFrame, fileName }) => {
       </div>
 
 
-      <label className='text-white'>
-        <input
-          type="checkbox"
-          checked={isChecked}
-          onChange={handleCheckboxChange}
-          className='cursor-pointer'
-        />
-        Display areas after processing
-      </label>
-    </div >
+    </div >}
+    {processedVideo && <DisplayProcessedVideo/>}
+    </>
   );
 };
 

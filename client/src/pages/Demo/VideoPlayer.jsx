@@ -14,10 +14,7 @@ const VideoPlayer = ({ programType, videoFile }) => {
     const video = videoRef.current;
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
-    // const targetWidth = 1050; // Specify the desired width
-    // const targetHeight = 500; // Specify the desired height
-    // canvas.width = targetWidth;
-    // canvas.height = targetHeight;
+
     canvas.width = video.videoWidth
     canvas.height = video.videoHeight
     context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, canvas.width, canvas.height);
@@ -25,11 +22,6 @@ const VideoPlayer = ({ programType, videoFile }) => {
     canvas.toBlob((blob) => {
       const url = URL.createObjectURL(blob);
       setSelectedFrame(url)
-      // const a = document.createElement('a');
-      // a.href = url;
-      // a.download = 'frame.png';
-      // a.click();
-      // URL.revokeObjectURL(url);
     });
 
   };
@@ -54,8 +46,8 @@ const VideoPlayer = ({ programType, videoFile }) => {
         </div>
       }
 
-      {programType == "Visitors Counter" && userSelectedFrame && <VisitorsCounter selectedFrame={selectedFrame} videoFile={ videoFile }/>}
-      {programType == "Theft Detector" && userSelectedFrame && <TheftDetector selectedFrame={selectedFrame} videoFile={ videoFile }/>}
+      {programType == "Visitors Counter" && userSelectedFrame && <VisitorsCounter selectedFrame={selectedFrame} programType={programType} videoFile={ videoFile }/>}
+      {programType == "Theft Detector" && userSelectedFrame && <TheftDetector selectedFrame={selectedFrame} programType={programType} videoFile={ videoFile }/>}
 
 
 

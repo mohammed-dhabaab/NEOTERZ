@@ -1,10 +1,10 @@
 import React, { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { plus } from "../../assets"
 import styles from '../../styles'
 import VideoPlayer from './VideoPlayer'
 import { account, sasToken, videoContainer } from './credentials';
 import { BlobServiceClient } from '@azure/storage-blob';
+import { BsFillPlusCircleFill } from "react-icons/bs";
 
 function Dropzone({ programType }) {
     const counterVistoersFrameSize = {
@@ -19,15 +19,6 @@ function Dropzone({ programType }) {
         setVideoFile(null)
     }
 
-    // const onDrop = useCallback(acceptedFiles => {
-
-    //     if (acceptedFiles?.length) {
-    //         const newFile = acceptedFiles[0]
-    //         const fileUrl = URL.createObjectURL(newFile)
-    //         setFile({ file: newFile, url: fileUrl })
-    //     }
-
-    // }, [])
     const blobServiceClient = new BlobServiceClient(`https://${account}.blob.core.windows.net/?${sasToken}`);  // create a blobServiceClient
     const containerClient = blobServiceClient.getContainerClient(videoContainer);  // create a containerClient
 
@@ -36,7 +27,6 @@ function Dropzone({ programType }) {
     const onDrop = useCallback(async (acceptedFiles) => {
         if (acceptedFiles?.length) {
             const newFile = acceptedFiles[0];
-            console.log(newFile)
             const fileUrl = URL.createObjectURL(newFile);
             setVideoFile({ fileName: newFile.name, file: newFile, url: fileUrl });
             if (!account || !sasToken || !videoContainer) { 
@@ -50,7 +40,6 @@ function Dropzone({ programType }) {
                     blobHTTPHeaders: { blobContentType: newFile.type }
                 }); 
             } finally {
-                // console.error("Done uploading");
             }
 
         }
@@ -79,25 +68,12 @@ function Dropzone({ programType }) {
                 {
                     isDragActive ?
                         <p className='text-sm text-gray-300'>Please Drop the files here ...</p> :
-                        <p className='text-sm text-gray-300'>Click <img src={plus} alt=""
-                            className="w-[12px] h-[12px] opacity-85 inline-block" /> to upload your video file or drag and drop it here</p>
+                        <p className='text-sm text-gray-300'>Click{" "}
+                        <BsFillPlusCircleFill fill='#65d6de' size={12} className="opacity-85 inline-block"/>
+                        {" "}to upload your video file or drag and drop it here</p>
                 }
             </div>}
 
-            {/* {file && <div className="relative">
-                <video controls width={counterVistoersFrameSize.width} height={counterVistoersFrameSize.height}>
-                    <source src={file.url} type="video/mp4" />
-                </video>
-                <button
-                    type='button'
-                    className='w-5 h-5 border border-secondary-400 bg-secondary-400 rounded-full flex justify-center items-center absolute -top-3 -right-3 hover:bg-black hover:border-none transition-all ease-in-out duration-1000'
-                    onClick={() => removeFile()}
-                >
-
-                    <img src={closeVideo} alt="Close"
-                        className='w-3 h-3' />
-                </button>
-            </div>} */}
             {videoFile && <VideoPlayer programType={programType} videoFile={videoFile}/>}
         </div>
 

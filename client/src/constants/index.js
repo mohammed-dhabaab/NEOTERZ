@@ -2,12 +2,8 @@ import { logo, menu, close, hero, ai, shield, analysis, quote, aliHassan, lukasM
 
 export const navLinks = [
   {
-    id: "home",
+    id: "",
     title: "Home",
-  },
-  {
-    id: "about-us",
-    title: "About Us",
   },
   {
     id: "contact",
