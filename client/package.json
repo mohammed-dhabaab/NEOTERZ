@@ -8,13 +8,14 @@
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "test": "jest"
+    "test": "jest --transform='babel-jest'"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.18.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@mui/material": "^5.15.17",
+    "axios": "^1.7.2",
     "fabric": "^5.3.0",
     "framer-motion": "^11.2.0",
     "konva": "^9.3.6",
@@ -30,6 +31,9 @@
     "react-spinners": "^0.13.8"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.5",
+    "@babel/plugin-transform-modules-commonjs": "^7.24.1",
+    "@babel/preset-env": "^7.24.5",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",

@@ -204,28 +204,69 @@ const TheftDetector = ({ selectedFrame, programType, fileName }) => {
 
 
 
-  const callNeotVideoProcessAPI = async () => {
-    const response = await fetch("http://neoterz-ai-api.uaenorth.cloudapp.azure.com:8080/get-and-process-video", {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(      {
-        "video_path": videoFile.fileName,
-        "program": programType,
-        "areas": polygons
-      })
-    });
+  // const callNeotVideoProcessAPI = async () => {
+  //   const response = await fetch("http://127.0.0.1:5000/get-and-process-video", {
+  //     method: "POST",
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //     body: JSON.stringify(      {
+  //       "video_path": videoFile.fileName,
+  //       "program": programType,
+  //       "areas": polygons
+  //     })
+  //   });
   
-    const processedVideoBlob = await response.blob();
+  //   const processedVideoBlob = await response.blob();
   
-    if (response.ok) {
-      const processedVideoUrl = URL.createObjectURL(processedVideoBlob);
-      setProcessedVideo(processedVideoUrl)
+  //   if (response.ok) {
+  //     const processedVideoUrl = URL.createObjectURL(processedVideoBlob);
+  //     setProcessedVideo(processedVideoUrl)
   
-      console.log("Processed video URL:", processedVideoUrl);
-    } else {
-      console.log('Request failed with status:', response.status);
+  //     console.log("Processed video URL:", processedVideoUrl);
+  //   } else {
+  //     console.log('Request failed with status:', response.status);
+  //   }
+  // };
+    const callNeotVideoProcessAPI = async () => {
+    try {
+      const response = await axios.post(
+        "http://neoterz-ai-api.uaenorth.cloudapp.azure.com:8080/get-and-process-video",
+        {
+          video_path: videoFile.fileName,
+          program: programType,
+          areas: polygons
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        try {
+          const response = await axios.post("http://neoterz-ai-api.uaenorth.cloudapp.azure.com:8080/uploade-video", {
+            // Add any data you need to send with the request
+          });
+        
+          if (response.status === 200) {
+            const videoBlob = new Blob([response.data]);
+            const videoUrl = URL.createObjectURL(videoBlob);
+            setProcessedVideo(videoUrl);
+        
+            console.log("Fetched video URL:", videoUrl);
+          } else {
+            console.log('Failed to fetch video with status:', response.status);
+          }
+        } catch (error) {
+          console.log('An error occurred while fetching the video:', error.message);
+        }
+      } else {
+        console.log('Request failed with status:', response.status);
+      }
+    } catch (error) {
+      console.log('An error occurred:', error.message);
     }
   };
 
@@ -283,8 +324,11 @@ const TheftDetector = ({ selectedFrame, programType, fileName }) => {
             <button onClick={savePoints} className={styles.controlButton}><IoSave /></button>
           </Tooltip> */}
 
-          <Tooltip title="Process" arrow enterDelay={700} leaveDelay={100}>
-            <button className={styles.controlButton}><GiProcessor /></button>
+<Tooltip title="Process" arrow enterDelay={700} leaveDelay={100}>
+            <button onClick={callNeotVideoProcessAPI} 
+            className={`${styles.controlButton} flex justify-center items-center gap-2 font-poppins font-medium`}>
+              <GiProcessor size={19}/> Process
+              </button>
           </Tooltip>
 
         </div>
@@ -292,7 +336,7 @@ const TheftDetector = ({ selectedFrame, programType, fileName }) => {
 
 
     </div >}
-    {processedVideo && <DisplayProcessedVideo/>}
+    {processedVideo && <DisplayProcessedVideo processedVideo={processedVideo}/>}
     </>
   );
 };

@@ -1,4 +1,4 @@
-const rgbToHexa = require("../rgbToHexa");
+import rgbToHexa from "../rgbToHexa.js";
 
 describe('rgbToHexa', () => {
     test('converts RGB color to hexadecimal', () => {

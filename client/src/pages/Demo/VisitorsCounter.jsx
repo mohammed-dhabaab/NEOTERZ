@@ -4,7 +4,7 @@ import styles from '../../styles';
 
 import ColorPicker from './ColorPicker';
 
-import fitShape from './fitShape';
+import fitShape from './utils/fitShape';
 
 import { Tooltip } from '@mui/material';
 import { FaUndoAlt, FaRedoAlt } from "react-icons/fa";
@@ -12,6 +12,8 @@ import { IoSave } from "react-icons/io5";
 import { AiOutlineAppstoreAdd } from "react-icons/ai";
 import { GiProcessor } from "react-icons/gi";
 import DisplayProcessedVideo from './DisplayProcessedVideo';
+
+import axios from 'axios';
 
 const rgbToHexa = (rgbColor) => {
   const [r, g, b] = rgbColor.match(/\d+/g);
@@ -32,6 +34,7 @@ const VisitorsCounter = ({ selectedFrame, programType, videoFile }) => {
   const [polygons, setPolygons] = useState([]);
 
   const [processedVideo, setProcessedVideo] = useState();
+
 
 
   useEffect(() => {
@@ -168,8 +171,8 @@ const VisitorsCounter = ({ selectedFrame, programType, videoFile }) => {
           );
           return [transformedPoint.x, transformedPoint.y];
         });
-        const polygonColor = rgbToHexa(object.fill); 
-        
+        const polygonColor = rgbToHexa(object.fill);
+
         updatedPolygons.push({
           points: fitShape(parentWidth, parentHeight, 1020, 500, polygonPoints),
           color: polygonColor,
@@ -207,99 +210,210 @@ const VisitorsCounter = ({ selectedFrame, programType, videoFile }) => {
   // };
 
 
+  // const callNeotVideoProcessAPI = async () => {
+  //   const response = await fetch("http://127.0.0.1:5000/get-and-process-video", {
+  //     method: "POST",
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //     body: JSON.stringify(      {
+  //       "video_path": videoFile.fileName,
+  //       "program": programType,
+  //       "areas": polygons
+  //     })
+  //   });
+
+  //   const processedVideoBlob = await response.blob();
+
+  //   if (response.ok) {
+  //     const processedVideoUrl = URL.createObjectURL(processedVideoBlob);
+  //     setProcessedVideo(processedVideoUrl)
+
+  //     console.log("Processed video URL:", processedVideoUrl);
+  //   } else {
+  //     console.log('Request failed with status:', response.status);
+  //   }
+  // };
+
+  // const callNeotVideoProcessAPI = async () => {
+  //   try {
+  //     const response = await axios.post(
+  //       "http://neoterz-ai-api.uaenorth.cloudapp.azure.com:8080/get-and-process-video",
+  //       {
+  //         video_path: videoFile.fileName,
+  //         program: programType,
+  //         areas: polygons
+  //       },
+  //       {
+  //         headers: {
+  //           'Content-Type': 'application/json'
+  //         }
+  //       }
+  //     );
+
+  //     const processedVideoBlob = new Blob([response.data]);
+
+  //     if (response.status === 200) {
+  //       const processedVideoUrl = URL.createObjectURL(processedVideoBlob);
+  //       setProcessedVideo(processedVideoUrl);
+
+  //       console.log("Processed video URL:", processedVideoUrl);
+  //     } else {
+  //       console.log('Request failed with status:', response.status);
+  //     }
+  //   } catch (error) {
+  //     console.log('An error occurred:', error.message);
+  //   }
+  // };
+
+
   const callNeotVideoProcessAPI = async () => {
-    const response = await fetch("http://neoterz-ai-api.uaenorth.cloudapp.azure.com:8080/get-and-process-video", {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(      {
-        "video_path": videoFile.fileName,
-        "program": programType,
-        "areas": polygons
-      })
-    });
-  
-    const processedVideoBlob = await response.blob();
-  
-    if (response.ok) {
-      const processedVideoUrl = URL.createObjectURL(processedVideoBlob);
-      setProcessedVideo(processedVideoUrl)
-  
-      console.log("Processed video URL:", processedVideoUrl);
-    } else {
-      console.log('Request failed with status:', response.status);
+    try {
+      const response = await axios.post(
+        "http://neoterz-ai-api.uaenorth.cloudapp.azure.com:8080/get-and-process-video",
+        {
+          video_path: videoFile.fileName,
+          program: programType,
+          areas: polygons
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        try {
+          const response = await axios.post("http://neoterz-ai-api.uaenorth.cloudapp.azure.com:8080/uploade-video", {
+            // Add any data you need to send with the request
+          });
+        
+          if (response.status === 200) {
+            const videoBlob = new Blob([response.data]);
+            const videoUrl = URL.createObjectURL(videoBlob);
+            setProcessedVideo(videoUrl);
+        
+            console.log("Fetched video URL:", videoUrl);
+          } else {
+            console.log('Failed to fetch video with status:', response.status);
+          }
+        } catch (error) {
+          console.log('An error occurred while fetching the video:', error.message);
+        }
+      } else {
+        console.log('Request failed with status:', response.status);
+      }
+    } catch (error) {
+      console.log('An error occurred:', error.message);
     }
   };
 
+  // const callNeotVideoProcessAPI = () => {
+  //   console.log()
+  // }
+  // const
 
+  // const callNeotVideoProcessAPI = async () => {
+  //   try {
+  //     const response = await axios.post("http://neoterz-ai-api.uaenorth.cloudapp.azure.com:8080/uploade-video", {
+  //       // Add any data you need to send with the request
+  //     });
+    
+  //     if (response.status === 200) {
+  //       const videoBlob = new Blob([response.data]);
+  //       const videoUrl = URL.createObjectURL(videoBlob);
+  //       setProcessedVideo(videoUrl);
+    
+  //       console.log("Fetched video URL:", videoUrl);
+  //     } else {
+  //       console.log('Failed to fetch video with status:', response.status);
+  //     }
+  //   } catch (error) {
+  //     console.log('An error occurred while fetching the video:', error.message);
+  //   }
+  // }
+
+// const displayVideo = () => {
+//   setProcessedVideo("./Visitors Counter.mp4")
+// }
   return (
     <>
-    
-    {!processedVideo && <div className='w-full'>
-      <div
-        ref={parentRef}
-        className={`relative w-full h-ful`}
-        style={{ aspectRatio: '2.04/1', height: parentHeight }}
-      >
-        <img src={selectedFrame} alt="" className=' object-cover object-center absolute z-1 rounded-xl' 
-        style={{ aspectRatio: '2.04/1', height: parentHeight }}
-        />
-        <canvas
-          ref={canvasRef}
-          className='absolute top-0 left-0 bottom-0 right-0 z-2'
-        />
-      </div >
 
-      <div className="flex justify-between items-center flex-wrap mt-2">
+      {!processedVideo && <div className='w-full'>
+        <div
+          ref={parentRef}
+          className={`relative w-full h-ful`}
+          style={{ aspectRatio: '2.04/1', height: parentHeight }}
+        >
+          <img src={selectedFrame} alt="" className=' object-cover object-center absolute z-1 rounded-xl'
+            style={{ aspectRatio: '2.04/1', height: parentHeight }}
+          />
+          <canvas
+            ref={canvasRef}
+            className='absolute top-0 left-0 bottom-0 right-0 z-2'
+          />
+        </div >
 
-        <div className='flex gap-1'>
-          <Tooltip title="Add Shape" arrow enterDelay={700} leaveDelay={100}>
-            <button onClick={addShape} className={`flex items-center justify-center ${styles.controlButton}`}>
-              <AiOutlineAppstoreAdd className="inline-block" />
-            </button>
-          </Tooltip>
-          {selectedShape === 'enter' && (
-            <ColorPicker
-              title="Change Enter Color"
-              color={selectedShapeColor}
-              onChange={handleEnterStrokeColorChange}
-            />
-          )}
-          {selectedShape === 'exit' && (
-            <ColorPicker
-              title="Change Exit Color"
-              color={selectedShapeColor}
-              onChange={handleExitStrokeColorChange}
-            />
-          )}
+        <div className="flex justify-between items-center flex-wrap mt-2">
 
-        </div>
-
-        <div className='flex gap-1'>
-          <Tooltip title="Undo" arrow enterDelay={700} leaveDelay={100}>
-            <button onClick={undo} className={styles.controlButton}><FaUndoAlt /></button>
-          </Tooltip>
-          <Tooltip title="Redo" arrow enterDelay={700} leaveDelay={100}>
-            <button onClick={redo} className={styles.controlButton}><FaRedoAlt /></button>
-          </Tooltip>
-
-        </div>
-
-        <div className='flex gap-1'>
-
-          <Tooltip title="Process" arrow enterDelay={700} leaveDelay={100}>
-            <button onClick={callNeotVideoProcessAPI} 
-            className={`${styles.controlButton} flex justify-center items-center gap-2 font-poppins font-medium`}>
-              <GiProcessor size={19}/> Process
+          <div className='flex gap-1'>
+            <Tooltip title="Add Shape" arrow enterDelay={700} leaveDelay={100}>
+              <button onClick={addShape} className={`flex items-center justify-center ${styles.controlButton}`}>
+                <AiOutlineAppstoreAdd className="inline-block" />
               </button>
-          </Tooltip>
+            </Tooltip>
+            {selectedShape === 'enter' && (
+              <ColorPicker
+                title="Change Enter Color"
+                color={selectedShapeColor}
+                onChange={handleEnterStrokeColorChange}
+              />
+            )}
+            {selectedShape === 'exit' && (
+              <ColorPicker
+                title="Change Exit Color"
+                color={selectedShapeColor}
+                onChange={handleExitStrokeColorChange}
+              />
+            )}
+
+          </div>
+
+          <div className='flex gap-1'>
+            <Tooltip title="Undo" arrow enterDelay={700} leaveDelay={100}>
+              <button onClick={undo} className={styles.controlButton}><FaUndoAlt /></button>
+            </Tooltip>
+            <Tooltip title="Redo" arrow enterDelay={700} leaveDelay={100}>
+              <button onClick={redo} className={styles.controlButton}><FaRedoAlt /></button>
+            </Tooltip>
+
+          </div>
+
+          <div className='flex gap-1'>
+
+            <Tooltip title="Process" arrow enterDelay={700} leaveDelay={100}>
+              <button onClick={callNeotVideoProcessAPI}
+                className={`${styles.controlButton} flex justify-center items-center gap-2 font-poppins font-medium`}>
+                <GiProcessor size={19} /> Process
+              </button>
+            </Tooltip>
+          </div>
         </div>
-      </div>
 
-    </div >}
+      </div >}
 
-    {processedVideo && <DisplayProcessedVideo/>}
+      {/* {processedVideo && <DisplayProcessedVideo processedVideo={processedVideo}/>} */}
+      {processedVideo &&
+          <video
+            src={processedVideo}
+            controls
+            className='pb-2 rounded-xl'
+            muted
+          >
+          </video>
+      }
+
     </>
   );
 };

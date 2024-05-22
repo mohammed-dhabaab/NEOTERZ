@@ -7,7 +7,11 @@ const DisplayProcessedVideo = ({ processedVideo }) => {
             controls
             className='pb-2 rounded-xl'
             muted
-        ></video>
+        >
+          <source src={URL.createObjectURL(processedVideoBlob)} type="video/mp4" />
+
+
+        </video>
     )
 }
 
