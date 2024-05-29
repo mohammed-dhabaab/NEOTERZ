@@ -265,50 +265,6 @@ const VisitorsCounter = ({ selectedFrame, programType, videoFile }) => {
   //     console.log('An error occurred:', error.message);
   //   }
   // };
-
-
-  const callNeotVideoProcessAPI = async () => {
-    try {
-      const response = await axios.post(
-        "http://neoterz-ai-api.uaenorth.cloudapp.azure.com:8080/get-and-process-video",
-        {
-          video_path: videoFile.fileName,
-          program: programType,
-          areas: polygons
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (response.status === 200) {
-        try {
-          const response = await axios.post("http://neoterz-ai-api.uaenorth.cloudapp.azure.com:8080/uploade-video", {
-            // Add any data you need to send with the request
-          });
-        
-          if (response.status === 200) {
-            const videoBlob = new Blob([response.data]);
-            const videoUrl = URL.createObjectURL(videoBlob);
-            setProcessedVideo(videoUrl);
-        
-            console.log("Fetched video URL:", videoUrl);
-          } else {
-            console.log('Failed to fetch video with status:', response.status);
-          }
-        } catch (error) {
-          console.log('An error occurred while fetching the video:', error.message);
-        }
-      } else {
-        console.log('Request failed with status:', response.status);
-      }
-    } catch (error) {
-      console.log('An error occurred:', error.message);
-    }
-  };
-
   // const callNeotVideoProcessAPI = () => {
   //   console.log()
   // }
@@ -337,6 +293,74 @@ const VisitorsCounter = ({ selectedFrame, programType, videoFile }) => {
 // const displayVideo = () => {
 //   setProcessedVideo("./Visitors Counter.mp4")
 // }
+
+  const callNeotVideoProcessAPI = async () => {
+    try {
+      const response = await axios.post(
+        "http://neoterz-ai-api.uaenorth.cloudapp.azure.com:8080/get-and-process-video",
+        {
+          video_path: videoFile.fileName,
+          program: programType,
+          areas: polygons
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        try {
+          const response = await axios.post("http://neoterz-ai-api.uaenorth.cloudapp.azure.com:8080/uploade-video", {
+            // Add any data you need to send with the request
+          });
+        
+          if (response.status === 200) {
+            // TO DO: Click to Download
+            setProcessedVideo("https://neoterz.blob.core.windows.net/videos/Result.mp4")
+        
+            console.log("Fetched video URL:", videoUrl);
+          } else {
+            console.log('Failed to fetch video with status:', response.status);
+          }
+        } catch (error) {
+          console.log('An error occurred while fetching the video:', error.message);
+        }
+      } else {
+        console.log('Request failed with status:', response.status);
+      }
+    } catch (error) {
+      console.log('An error occurred:', error.message);
+    }
+  };
+
+  // const callNeotVideoProcessAPI = async () => {
+  //   try {
+  //     const response = await axios.post(
+  //       "http://neoterz-ai-api.uaenorth.cloudapp.azure.com:8080/get-and-process-video",
+  //       {
+  //         video_path: videoFile.fileName,
+  //         program: programType,
+  //         areas: polygons
+  //       },
+  //       {
+  //         headers: {
+  //           'Content-Type': 'application/json'
+  //         }
+  //       }
+  //     );
+  //     if (response.status === 200) {
+  //       setProcessedVideo("https://neoterz.blob.core.windows.net/videos/Visitors%20Counter.mp4")
+  //     } else {
+  //       console.log('Request failed with status:', response.status);
+  //     }
+  //   } catch (error) {
+  //     console.log('An error occurred:', error.message);
+  //   }
+  // };
+
+
   return (
     <>
 
@@ -405,13 +429,10 @@ const VisitorsCounter = ({ selectedFrame, programType, videoFile }) => {
 
       {/* {processedVideo && <DisplayProcessedVideo processedVideo={processedVideo}/>} */}
       {processedVideo &&
-          <video
-            src={processedVideo}
-            controls
-            className='pb-2 rounded-xl'
-            muted
-          >
-          </video>
+<div>
+<a href={processedVideo} style={{ backgroundColor: '#5fc8d1', color:'black' }} className="text-white text-xl font-semibold px-4 py-2 hover:bg-teal-400 rounded-full border border-teal-300 hover:border-teal-500 transition-colors">Click to Download</a>
+
+</div>
       }
 
     </>

@@ -228,7 +228,8 @@ const TheftDetector = ({ selectedFrame, programType, fileName }) => {
   //     console.log('Request failed with status:', response.status);
   //   }
   // };
-    const callNeotVideoProcessAPI = async () => {
+ 
+  const callNeotVideoProcessAPI = async () => {
     try {
       const response = await axios.post(
         "http://neoterz-ai-api.uaenorth.cloudapp.azure.com:8080/get-and-process-video",
@@ -251,9 +252,8 @@ const TheftDetector = ({ selectedFrame, programType, fileName }) => {
           });
         
           if (response.status === 200) {
-            const videoBlob = new Blob([response.data]);
-            const videoUrl = URL.createObjectURL(videoBlob);
-            setProcessedVideo(videoUrl);
+            // TO DO: Click to Download
+            setProcessedVideo("https://neoterz.blob.core.windows.net/videos/Result.mp4")
         
             console.log("Fetched video URL:", videoUrl);
           } else {
@@ -336,7 +336,10 @@ const TheftDetector = ({ selectedFrame, programType, fileName }) => {
 
 
     </div >}
-    {processedVideo && <DisplayProcessedVideo processedVideo={processedVideo}/>}
+    {processedVideo && <div>
+<a href={processedVideo} style={{ backgroundColor: '#5fc8d1', color:'black' }} className="text-white text-xl font-semibold px-4 py-2 hover:bg-teal-400 rounded-full border border-teal-300 hover:border-teal-500 transition-colors">Click to Download</a>
+
+</div>}
     </>
   );
 };
