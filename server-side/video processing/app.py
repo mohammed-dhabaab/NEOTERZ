@@ -28,6 +28,7 @@ except Exception as e:
 def get_and_process_video():
     # make sure to get user_preferences data
     try:
+        print('arraived')
         user_preferences = request.get_json()
         if not user_preferences:
             return jsonify({"error": "No data provided"}), 400
@@ -52,10 +53,27 @@ def get_and_process_video():
         if not os.path.isfile(video_path):
           abort(404, description="Video not found")
         
-        return send_from_directory(directory,"Visitors Counter.mp4", as_attachment=True)
+        return send_from_directory(directory,"Visitors Counter.mp4", as_attachment=False, mimetype='video/mp4')
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/uploade-video', methods=['POST'])
+def upload_video_to_blob():
+    try:
+        # Create a blob service client
+        blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+
+        # Get a blob client using the local file name as the name for the blob
+        blob_client = blob_service_client.get_blob_client(container=container_name, blob="Result.mp4")
+
+        # Upload the file
+        with open("Visitors Counter.mp4", "rb") as data:
+            blob_client.upload_blob(data, overwrite=True)
+            
+        return jsonify({"message": "File was uploaded successfully"}), 200
+  
+    except Exception as ex:
+        print('Error:', ex)
 
 if __name__=="__main__":
     app.run(debug=True, host="0.0.0.0", port=8080, threaded=True)
